@@ -14,6 +14,17 @@
 
 iPhone App 首次构建安装仍需 **Mac、Xcode 和自己的开发者账号**，安装后可脱离 Mac 独立使用。目前没有 Windows 或 Android 客户端。没有打印机也可以体验选词和标签预览。
 
+## 实际使用
+
+下面是作者的实际使用记录：P0 打印英文与音标标签，以及在 iPhone 上上传物品照片，让 AI 帮助选词并生成待确认卡片。
+
+| P0 与实际打印的标签 | iPhone 照片识物与选词 |
+| --- | --- |
+| ![德佟 P0 与实际打印出的 Good morning、fridge 和 Mouse Pad 英文音标标签](docs/images/p0-real-print.jpg) | ![iPhone 中上传水壶照片，AI 建议 pitcher 并生成待确认打印卡片](docs/images/iphone-photo-to-label.jpg) |
+| 实物标签包含 Good morning、fridge 和 Mouse Pad，英文与音标各占一行。 | 上传照片询问英文表达，得到 pitcher 和音标，点击“确认打印”后才会下发。 |
+
+[查看出纸原图](docs/images/p0-real-print.jpg) · [查看手机截图原图](docs/images/iphone-photo-to-label.jpg)
+
 ## 界面预览
 
 ![词签界面总览：翻译选词、双行标签预览和 AI 待确认打印卡片](docs/images/overview.png)
@@ -88,7 +99,7 @@ cd english-printer
 - **模型兼容性**：使用 Anthropic Messages 协议；仅兼容 OpenAI Chat Completions 的接口不能直接使用。生成打印卡片还需要工具调用能力。
 - **音标准确性**：AI 卡片优先使用本地词典；词典缺词时可能采用模型给出的音标，需要自行核对，不能视作词典校验通过。
 - **打印结果**：“已打印”代表收到设备完成回执，纸面效果仍需检查；“已发送”或“结果未确认”时先看是否已出纸，避免重复打印。
-- **验证范围**：Mac 与 P0 已有实机单张打印验证。iOS 安装和首屏已有验证记录，iOS 真机打印、语音与键盘交互，以及不同标签尺寸的纸面效果仍需逐项验收；模拟测试不能替代这些验证。
+- **验证范围**：已有 P0 实际出纸照片，以及 iPhone 照片识物、英文建议与待确认卡片的使用记录。Mac 与 P0 已有实机单张打印验证；iPhone 截图展示的是待确认状态，iOS 独立打印、语音与键盘交互，以及不同标签尺寸的纸面效果仍需逐项验收。
 
 配置读取接口不返回已保存的 Key；Mac 配置存于已忽略的本机文件（0600，未加密），iOS 使用 Keychain。聊天历史各端独立保存在本机。详细存储位置与故障处理见[使用指南](docs/usage.md)。
 
