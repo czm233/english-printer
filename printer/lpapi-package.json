@@ -1,0 +1,68 @@
+{
+    "name": "lpapi-ble",
+    "version": "1.7.260618",
+    "author": "DothanTech <hudianxing@dothantech.com>",
+    "homepage": "https://thanmore.net",
+    "license": "ISC",
+    "moduleName": "LPAPI",
+    "fileName": "lpapi-ble",
+    "main": "libs/index.umd.js",
+    "module": "libs/index.esm.js",
+    "types": "libs/index.d.ts",
+    "typings": "libs/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "compile": "tsc --build",
+        "clean": "npx shx rm -rf tsconfig.tsbuildinfo ./node_modules",
+        "dev": "set NODE_ENV=development && rollup -c",
+        "build": "set NODE_ENV=production && rollup -c",
+        "serve": "vue-cli-service serve",
+        "dist": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
+    },
+    "description": "一款基于浏览器自带蓝牙的标签打印接口",
+    "directories": {
+        "doc": "doc",
+        "lib": "libs",
+        "test": "__tests__"
+    },
+    "files": [
+        "libs"
+    ],
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {
+        "core-js": "^3.8.3",
+        "dz-canvas": "^1.0.251107",
+        "vue": "^2.7.14"
+    },
+    "devDependencies": {
+        "@rollup/plugin-babel": "^6.0.4",
+        "@rollup/plugin-commonjs": "^28.0.2",
+        "@rollup/plugin-eslint": "^9.0.5",
+        "@rollup/plugin-json": "^6.1.0",
+        "@rollup/plugin-node-resolve": "^15.3.0",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^12.1.0",
+        "@types/w3c-web-hid": "^1.0.7",
+        "@types/web-bluetooth": "^0.0.21",
+        "@vue/cli-plugin-babel": "~5.0.0",
+        "@vue/cli-plugin-typescript": "~5.0.0",
+        "@vue/cli-service": "~5.0.8",
+        "@vue/eslint-config-typescript": "^9.1.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-vue": "^8.0.3",
+        "prettier": "^2.6.0",
+        "rollup": "^4.24.0",
+        "rollup-plugin-copy": "^3.5.0",
+        "rollup-plugin-delete": "^2.1.0",
+        "rollup-plugin-typescript2": "^0.37.0",
+        "sass": "^1.32.7",
+        "sass-loader": "^12.0.0",
+        "shx": "^0.4.0",
+        "typescript": "^5.3.3",
+        "vue-template-compiler": "^2.7.14"
+    }
+}

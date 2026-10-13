@@ -1,0 +1,49 @@
+P0 Mac 命令行打印测试
+
+2026-10-11 新增网页打印入口
+server/printer.mjs 通过 bridge.swift 常驻蓝牙连接、查询设备状态并发送 SDK 编码；label.swift 从标准输入接收网页内容和字号、边距、边框设置，输出实际 PNG/RGBA。
+网页已完成真实连接、打印一次 hello /həˈləʊ/、断开、重连，收到设备打印完成状态；本次纸面效果待用户确认。
+以下 run.sh 说明仅针对保留的旧诊断命令。使用前在网页断开设备，不能两个程序同时占用打印机。旧诊断命令不读取网页设置。
+
+验证记录（2026-10-11）
+已使用 macOS CoreBluetooth 连接用户 P0，开启通知并进行双向通信。
+设备报告 203 dpi、96 点打印头、间隙纸类型 2、间隔 3mm、可打印状态 0。
+发送 hello / həˈləʊ 一张标签，用户确认“已出纸，排版正确”。
+当前版本仅验证这台设备，默认固定其本机蓝牙 UUID，避免连接附近其他打印机。
+
+使用
+在终端进入本目录，然后执行：
+./run.sh status
+./run.sh preview 'hello' 'həˈləʊ'
+./run.sh print 'hello' 'həˈləʊ'
+print 每次实际打印一张；preview 只生成 preview.png，不连接设备。
+程序前台运行并自动退出，无后台进程，无服务器、网络端口或 Docker 依赖。
+需要 Mac 蓝牙开启、打印机开机、手机微打断开连接，以及本机 Swift 和 Node.js。
+如系统提示蓝牙访问，请允许用于运行程序的终端访问蓝牙。
+
+模板
+30mm 宽 × 12mm 高。203 dpi 栅格为 240 × 96 点。
+上/下边距 2mm，左/右边距 1mm。
+上框：x=1mm，y=2mm，宽=28mm，高=4mm（坐标从左上角起）。
+下框：x=1mm，y=6mm，宽=28mm，高=4mm。
+两框文字水平与垂直居中；Arial 10pt；黑白渲染。
+出纸旋转 90°，间隙纸，不干胶间隔 3mm，偏移 0。
+速度和浓度不下发修改指令，沿用设备设置。
+字号 10 暂按 10pt 实现，尚未与微打内部字号单位逐项比对；本次实物效果已获用户确认。
+长词组超过可用宽度时拒绝打印，避免截断；暂不自动缩小或换行。
+
+实现
+render.swift：AppKit 绘制文字及音标，保存 PNG 与 RGBA。
+encode.cjs：使用厂商发布的 lpapi-ble SDK 生成打印数据。
+transport.swift：CoreBluetooth 通知与分包写入，接收原始协议响应。
+run.sh：编译与命令入口。
+lpapi.cjs：lpapi-ble 1.7.260618 的 UMD 文件原样复制，仅更改扩展名。
+来源：https://registry.npmjs.org/lpapi-ble/-/lpapi-ble-1.7.260618.tgz
+发布者信息：DothanTech <hudianxing@dothantech.com>，包元数据声明 ISC 许可。
+厂商 SDK 官方下载入口：https://detonger.com/software-sdk-download.html
+保留上游元数据于 lpapi-package.json。
+
+限制
+这是单张打印诊断程序，不是完整打印队列；SENT 表示蓝牙数据写完，不代表实物打印完成。
+状态命令显示 RX 原始数据。尚未实现完整状态解析、自动重连或复杂故障恢复。
+不要同时运行多个打印命令。单张测试成功不代表 iOS 移植已经完成。

@@ -1,0 +1,43 @@
+// !$*UTF8*$!
+{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+DFBA7AADE0868074C2861C98 = { isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+DA8FEDCCD646F93205B764F8 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/App.swift; sourceTree = "<group>"; };
+9E1FBDCF039160110E2ED74F = { isa = PBXBuildFile; fileRef = DA8FEDCCD646F93205B764F8; };
+97D5708D0277366ED02D9483 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/AppDiagnostics.swift; sourceTree = "<group>"; };
+2A350A7A981C9EEB71F86DB8 = { isa = PBXBuildFile; fileRef = 97D5708D0277366ED02D9483; };
+4536CF56D3C17833D62D74EC = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/ChatHistoryStore.swift; sourceTree = "<group>"; };
+DFB853F07F5974F69034EF87 = { isa = PBXBuildFile; fileRef = 4536CF56D3C17833D62D74EC; };
+A5445C13BF2F3B5B285413AF = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/DiagnosticLog.swift; sourceTree = "<group>"; };
+7659D88D08618CF7FFD3637D = { isa = PBXBuildFile; fileRef = A5445C13BF2F3B5B285413AF; };
+98E2DEEF656386B524B19A42 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/ModelConfig.swift; sourceTree = "<group>"; };
+B372044354932AE495950723 = { isa = PBXBuildFile; fileRef = 98E2DEEF656386B524B19A42; };
+72CC0340D9382777B0867195 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/ModelService.swift; sourceTree = "<group>"; };
+7C15B704B656C47554E73312 = { isa = PBXBuildFile; fileRef = 72CC0340D9382777B0867195; };
+8ADBDFCC1EB54B92F37A2756 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/PrinterCodec.swift; sourceTree = "<group>"; };
+AC4E8F08075A3C4BA375EC34 = { isa = PBXBuildFile; fileRef = 8ADBDFCC1EB54B92F37A2756; };
+10B1348CEA7F98CCF21AC122 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/PrinterService.swift; sourceTree = "<group>"; };
+933D6D0D1290E13FA3DB26E7 = { isa = PBXBuildFile; fileRef = 10B1348CEA7F98CCF21AC122; };
+6E7B67CA4894162377C822B1 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/PrinterViewController.swift; sourceTree = "<group>"; };
+739AF8A926B0969B5ECE1A2B = { isa = PBXBuildFile; fileRef = 6E7B67CA4894162377C822B1; };
+11DE9759B98CAA7A22518745 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnglishPrinter/SpeechService.swift; sourceTree = "<group>"; };
+1FB5B739CC19624811FC9754 = { isa = PBXBuildFile; fileRef = 11DE9759B98CAA7A22518745; };
+7F7B4BF85F4B08507A23E595 = { isa = PBXFileReference; lastKnownFileType = folder; path = "../web"; sourceTree = "<group>"; };
+652E887A513E422241FE9953 = { isa = PBXBuildFile; fileRef = 7F7B4BF85F4B08507A23E595; };
+4C2BF1C3556A5EBFEACB16AF = { isa = PBXFileReference; lastKnownFileType = text; path = "../printer/lpapi.cjs"; sourceTree = "<group>"; };
+CA444044E2977D39B67884FA = { isa = PBXBuildFile; fileRef = 4C2BF1C3556A5EBFEACB16AF; };
+B2B4367B873474FE1C68712A = { isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "EnglishPrinter/Assets.xcassets"; sourceTree = "<group>"; };
+FB90684E69A6C96ED866993E = { isa = PBXBuildFile; fileRef = B2B4367B873474FE1C68712A; };
+38A007151ABE87CC01A5B6E9 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = EnglishPrinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+64292B1C2B2E13EAD8788FC8 = { isa = PBXGroup; children = (DFBA7AADE0868074C2861C98,DA8FEDCCD646F93205B764F8,97D5708D0277366ED02D9483,4536CF56D3C17833D62D74EC,A5445C13BF2F3B5B285413AF,98E2DEEF656386B524B19A42,72CC0340D9382777B0867195,8ADBDFCC1EB54B92F37A2756,10B1348CEA7F98CCF21AC122,6E7B67CA4894162377C822B1,11DE9759B98CAA7A22518745,7F7B4BF85F4B08507A23E595,4C2BF1C3556A5EBFEACB16AF,B2B4367B873474FE1C68712A,38A007151ABE87CC01A5B6E9); sourceTree = "<group>"; };
+BCE16DD0260827ECF338C787 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (9E1FBDCF039160110E2ED74F,2A350A7A981C9EEB71F86DB8,DFB853F07F5974F69034EF87,7659D88D08618CF7FFD3637D,B372044354932AE495950723,7C15B704B656C47554E73312,AC4E8F08075A3C4BA375EC34,933D6D0D1290E13FA3DB26E7,739AF8A926B0969B5ECE1A2B,1FB5B739CC19624811FC9754); runOnlyForDeploymentPostprocessing = 0; };
+0189424A5A60FED329FA868E = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (652E887A513E422241FE9953,CA444044E2977D39B67884FA,FB90684E69A6C96ED866993E); runOnlyForDeploymentPostprocessing = 0; };
+7561BFB015D8F536760CB671 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+89E1FD6268CC0F221A2BE178 = { isa = XCBuildConfiguration; name = Debug; buildSettings = { DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; }; };
+E6DE6C99132752C914FEF632 = { isa = XCBuildConfiguration; name = Release; buildSettings = { DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; SWIFT_OPTIMIZATION_LEVEL = "-O"; }; };
+862894B703A6DEDF96A9DD6C = { isa = XCConfigurationList; buildConfigurations = (89E1FD6268CC0F221A2BE178,E6DE6C99132752C914FEF632); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+7082CC0B6FC1282FCEABD07A = { isa = XCBuildConfiguration; name = Debug; baseConfigurationReference = DFBA7AADE0868074C2861C98; buildSettings = { DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; PRODUCT_NAME = EnglishPrinter; INFOPLIST_FILE = EnglishPrinter/Info.plist; CODE_SIGN_STYLE = Automatic; TARGETED_DEVICE_FAMILY = 1; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; ENABLE_USER_SCRIPT_SANDBOXING = YES; }; };
+639A7CA24D39909E713B47F7 = { isa = XCBuildConfiguration; name = Release; baseConfigurationReference = DFBA7AADE0868074C2861C98; buildSettings = { DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SWIFT_VERSION = 5.0; SWIFT_OPTIMIZATION_LEVEL = "-O"; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; PRODUCT_NAME = EnglishPrinter; INFOPLIST_FILE = EnglishPrinter/Info.plist; CODE_SIGN_STYLE = Automatic; TARGETED_DEVICE_FAMILY = 1; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; ENABLE_USER_SCRIPT_SANDBOXING = YES; }; };
+C57128001CE614BF8549D6BB = { isa = XCConfigurationList; buildConfigurations = (7082CC0B6FC1282FCEABD07A,639A7CA24D39909E713B47F7); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+0E8A3AD980EC179856012B7E = { isa = PBXNativeTarget; name = EnglishPrinter; productName = EnglishPrinter; productType = "com.apple.product-type.application"; productReference = 38A007151ABE87CC01A5B6E9; buildConfigurationList = C57128001CE614BF8549D6BB; buildPhases = (BCE16DD0260827ECF338C787,7561BFB015D8F536760CB671,0189424A5A60FED329FA868E); buildRules = (); dependencies = (); };
+98F54143AB4E86B28C3AFEE0 = { isa = PBXProject; attributes = { LastUpgradeCheck = 2640; }; buildConfigurationList = 862894B703A6DEDF96A9DD6C; compatibilityVersion = "Xcode 14.0"; developmentRegion = zh_CN; knownRegions = (zh_CN,en,Base); mainGroup = 64292B1C2B2E13EAD8788FC8; projectDirPath = ""; projectRoot = ""; targets = (0E8A3AD980EC179856012B7E); };
+}; rootObject = 98F54143AB4E86B28C3AFEE0; }

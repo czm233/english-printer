@@ -1,0 +1,18 @@
+// Metadata allowlist shared by the browser and Node. Native independently enforces the same boundary.
+(()=>{
+const lists={"events": ["app.start", "app.active", "app.background", "app.terminate", "app.memory_warning", "app.previous_session", "app.stall", "app.thermal", "web.ready", "web.error", "web.rejection", "web.long_task", "web.action", "web.navigation", "web.visibility", "web.terminated", "web.load_error", "bridge.start", "bridge.end", "bridge.error", "bridge.delivery_error", "model.start", "model.headers", "model.first_text", "model.complete", "model.error", "model.cancel", "model.background_expired", "printer.start", "printer.stage", "printer.end", "printer.error", "printer.disconnected", "printer.bluetooth", "speech.start", "speech.end", "speech.error", "metric.crash", "metric.hang", "metric.cpu", "metric.disk", "metric.summary", "diagnostic.test","history.read","history.write"], "tokens": ["native", "web", "server", "active", "inactive", "background", "unknown", "clean", "unclosed", "chat", "print", "settings", "label", "model", "start", "connect", "disconnect", "status", "render", "sending", "sent", "printed", "unknown_result", "duplicate", "request", "config", "translation", "dictionary","history", "cancelChat", "speechStart", "speechStop", "speechCancel", "navigation", "chat_fetch", "headers", "stream", "tools", "complete", "timeout", "cancelled", "expired", "network", "app", "webkit", "posix", "cocoa", "other", "not-allowed", "service-not-allowed", "audio-capture", "Error", "TypeError", "RangeError", "ReferenceError", "SyntaxError", "URIError", "EvalError", "AbortError", "UnhandledRejection", "resource", "js", "nominal", "fair", "serious", "critical"], "sources": ["index.html", "app.js", "assistant.js","chat-store.js", "choice-cards.js", "ios-bridge.js", "custom-print.js", "print-cards.js", "phonetics.js", "sse.js", "chat-input.js", "interactions.js", "markdown.js", "pronunciation-audio.js", "diagnostics.js", "diagnostic-schema.js", "marked.umd.js", "purify.min.js"], "actions": ["clear", "speak", "customPrint", "printAgain", "translatePrint", "settingsTab", "printTab", "chatTab", "chatBack", "newChat", "chatHistory", "sendChat", "retryChat", "saveConfig", "connect", "confirmCustom", "cancelCustom", "clearCustom", "retryMeaning", "speakCustom", "speakSample", "voiceToggle", "holdToTalk", "choosePhoto", "removePhoto", "labelSettingsTab", "modelSettingsTab", "confirm_card", "choose_option", "audio"]};
+const numbers=new Set(['ms','first_ms','count','bytes','characters','tools','status','code','line','column','queue','dropped','pending','state_code','signal','exception','duration_ms','peak_mb']);
+function clean(value){
+ if(!value||!lists.events.includes(value.event))return null;
+ const level=['debug','info','warning','error'].includes(value.level)?value.level:'info',fields={};
+ for(const [key,v] of Object.entries(value.fields||{})){
+  if(numbers.has(key)&&typeof v==='number'&&Number.isFinite(v))fields[key]=Math.max(-1e9,Math.min(1e9,v));
+  else if(['request','previous','parent'].includes(key)&&typeof v==='string'&&/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(v))fields[key]=v.toUpperCase();
+  else if(['stage','kind','page','state','reason','domain','error_type'].includes(key)&&lists.tokens.includes(v))fields[key]=v;
+  else if(key==='source'&&lists.sources.includes(v))fields[key]=v;
+  else if(key==='action'&&lists.actions.includes(v))fields[key]=v;
+ }
+ return {event:value.event,level,fields};
+}
+const api={clean,lists};if(typeof module!=='undefined'&&module.exports)module.exports=api;else globalThis.P0DiagnosticSchema=api;
+})();
