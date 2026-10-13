@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1765ef">
+  <title>词签 English Printer · 把英语，贴进生活</title>
+  <meta name="description" content="词签把身边物品变成英语学习标签。中英双向输入、美式音标、发音朗读与 AI 选词，连接德佟 P0，打印属于你的日常词汇。">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:title" content="词签 · 把英语，贴进生活">
+  <meta property="og:description" content="一行英文，一行音标。从眼前的物品开始，让每一次看见，都成为一次练习。">
+  <meta property="og:url" content="https://czm233.github.io/english-printer/">
+  <meta property="og:image" content="https://czm233.github.io/english-printer/assets/lifestyle.webp">
+  <link rel="canonical" href="https://czm233.github.io/english-printer/">
+  <link rel="icon" type="image/png" href="./assets/app-icon.png">
+  <link rel="apple-touch-icon" href="./assets/app-icon.png">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="词签首页">
+        <img src="./assets/app-icon.png" width="38" height="38" alt="" draggable="false">
+        <span>词签</span>
+      </a>
+      <nav aria-label="主导航">
+        <a href="#features">功能</a>
+        <a href="#how-it-works">如何使用</a>
+        <a href="#faq">常见问题</a>
+      </nav>
+      <a class="repository-link" href="https://github.com/czm233/english-printer" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">English Printer</p>
+        <h1 id="hero-title">把英语，<br><span>贴进生活。</span></h1>
+        <p class="hero-description">从眼前的物品开始。<br>一行英文，一行音标，让每一次看见，<br class="desktop-break">都成为一次练习。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#start">开始使用 <span aria-hidden="true">↗</span></a>
+          <a class="button text-link" href="#experience">试试标签 <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <figure class="hero-visual">
+        <img class="lifestyle" src="./assets/lifestyle.webp" width="1536" height="1024" fetchpriority="high" alt="明亮厨房里的一只蓝色马克杯，身边物品也是学英语的起点。AI 生成场景配图。" draggable="false">
+        <div class="hero-label" aria-label="标签示例：mug，音标 /mʌɡ/">
+          <span lang="en">mug</span><span class="ipa" lang="en-fonipa">/mʌɡ/</span>
+        </div>
+        <figcaption>从每天拿起的杯子开始。</figcaption>
+      </figure>
+    </section>
+
+    <section class="experience" id="experience" aria-labelledby="experience-title">
+      <div class="container experience-inner">
+        <div class="experience-copy">
+          <h2 id="experience-title">熟悉的东西，<br>新的认识。</h2>
+          <p>选一个身边的物品，看看它的英文标签。</p>
+          <div class="word-options" role="group" aria-label="选择标签示例">
+            <button type="button" data-word="mug" aria-pressed="true" disabled>杯子</button>
+            <button type="button" data-word="fridge" aria-pressed="false" disabled>冰箱</button>
+            <button type="button" data-word="lamp" aria-pressed="false" disabled>台灯</button>
+            <button type="button" data-word="chair" aria-pressed="false" disabled>椅子</button>
+          </div>
+        </div>
+        <div class="label-demo">
+          <div class="label-paper" aria-live="polite" aria-atomic="true">
+            <span id="demo-word" lang="en">mug</span>
+            <span id="demo-ipa" class="ipa" lang="en-fonipa">/mʌɡ/</span>
+          </div>
+          <div class="label-caption">
+            <span>30 × 12 mm 标签示意</span>
+            <button class="listen-button" id="listen" type="button" aria-label="朗读英文 mug" disabled>朗读 <span aria-hidden="true">↗</span></button>
+          </div>
+          <p class="speech-status" id="speech-status" role="status"></p>
+          <noscript><p class="no-script">启用 JavaScript 后可切换示例和朗读。</p></noscript>
+        </div>
+      </div>
+    </section>
+
+    <section class="features container section" id="features" aria-labelledby="features-title">
+      <div class="section-heading">
+        <h2 id="features-title">从“这是什么”，<br>到“原来这样说”。</h2>
+        <p>把选词、发音和打印，放进同一个小工具。</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-panel translate-panel">
+          <div class="feature-copy">
+            <h3>选对生活里的那个词</h3>
+            <p>中文、英文都能输入。核对译文与美式音标，选好合适的表达，再打印。</p>
+          </div>
+          <figure class="app-figure">
+            <div class="phone-frame"><img src="./assets/app-print.png" width="390" height="844" loading="lazy" alt="词签打印页，输入冰箱后选择 fridge，显示英文与音标并提供打印按钮。演示数据。" draggable="false"></div>
+            <figcaption>打印页面 · 演示数据</figcaption>
+          </figure>
+          <p class="feature-note">标签尺寸、字号和边距，按你的需要调整。</p>
+        </article>
+        <article class="feature-panel ai-panel">
+          <div class="feature-copy">
+            <h3>拿不准，问问 AI</h3>
+            <p>描述物品，或选择一张照片。让 AI 帮你理解差别、挑选表达，再确认标签。</p>
+          </div>
+          <figure class="app-figure">
+            <div class="phone-frame"><img src="./assets/app-chat.png" width="390" height="844" loading="lazy" alt="词签 AI 助手页面，回复中给出英文、音标和需要用户确认的打印卡片。演示数据。" draggable="false"></div>
+            <figcaption>AI 助手 · 演示数据</figcaption>
+          </figure>
+          <p class="feature-note">对话保存在本机，熟悉的词可以再回来看。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="how-section container section" id="how-it-works" aria-labelledby="how-title">
+      <h2 id="how-title">想到一个词，<br class="mobile-break">留下一张签。</h2>
+      <ol class="steps">
+        <li><span class="step-number" aria-hidden="true">1</span><h3>找到想学的词</h3><p>输入中文或英文，也可以和 AI 聊聊眼前的物品。</p></li>
+        <li><span class="step-number" aria-hidden="true">2</span><h3>看看，再听听</h3><p>核对英文与音标，点一下朗读，先认识它的发音。</p></li>
+        <li><span class="step-number" aria-hidden="true">3</span><h3>打印，贴进日常</h3><p>连接德佟 P0，确认后打印。太长的词组可拆成多张。</p></li>
+      </ol>
+    </section>
+
+    <section class="start-section" id="start" aria-labelledby="start-title">
+      <div class="container start-inner">
+        <div class="start-copy">
+          <img src="./assets/app-icon.png" width="64" height="64" alt="" loading="lazy" draggable="false">
+          <h2 id="start-title">你的下一张词签，<br>会贴在哪里？</h2>
+          <p>准备一台德佟 P0 和标签纸，<br>从身边的第一个词开始。</p>
+        </div>
+        <div class="install-options">
+          <article>
+            <div><h3>在 iPhone 上使用</h3><p>iOS 17 或更新版本。使用 Xcode 签名安装，手机可独立连接打印机。</p></div>
+            <a class="button primary" href="https://github.com/czm233/english-printer/blob/main/ios/README.md" target="_blank" rel="noopener noreferrer">iPhone 安装指南 <span aria-hidden="true">↗</span></a>
+          </article>
+          <article>
+            <div><h3>在 Mac 上使用</h3><p>启动本地服务后，在浏览器中使用。由 Mac 蓝牙连接打印机。</p></div>
+            <a class="button secondary" href="https://github.com/czm233/english-printer#快速开始" target="_blank" rel="noopener noreferrer">Mac 启动指南 <span aria-hidden="true">↗</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section container section" id="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">开始前，你可能想知道</h2>
+      <div class="faq-list">
+        <details><summary>需要什么打印机和纸张？<span class="plus" aria-hidden="true"></span></summary><p>当前支持德佟 P0 蓝牙标签打印机，默认标签尺寸为 30 × 12 mm。请使用与设备匹配的标签纸；其他型号尚未验证。</p></details>
+        <details><summary>可以从 App Store 下载吗？<span class="plus" aria-hidden="true"></span></summary><p>目前提供源码与安装指南，尚未提供 App Store 或 TestFlight 下载。iPhone 版本需要 Mac、Xcode 和自己的 Apple 签名配置。</p></details>
+        <details><summary>使用 AI 需要额外配置吗？<span class="plus" aria-hidden="true"></span></summary><p>需要在设置中填写你自己的模型服务地址、API Key 和模型名称，服务须兼容 Anthropic Messages 协议。照片识别需要模型支持图片，使用费用以模型服务商为准。</p></details>
+        <details><summary>没有网络也能用吗？<span class="plus" aria-hidden="true"></span></summary><p>翻译和 AI 对话需要网络；音标词典与聊天历史保存在本机。翻译内容会发送到翻译服务，对话和主动发送的照片会发送给你配置的模型服务。</p></details>
+        <details><summary>这个网页能直接打印吗？<span class="plus" aria-hidden="true"></span></summary><p>这里是产品介绍与标签示例。真实打印请使用 iPhone App 或 Mac 本地服务；AI 生成的标签也需要你确认后才会打印。</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer container">
+    <a class="brand" href="#" aria-label="回到词签首页"><img src="./assets/app-icon.png" width="28" height="28" alt="" loading="lazy" draggable="false"><span>词签</span></a>
+    <span class="footer-name">English Printer</span>
+    <a href="https://github.com/czm233/english-printer/issues" target="_blank" rel="noopener noreferrer">反馈与建议 <span aria-hidden="true">↗</span></a>
+  </footer>
+</body>
+</html>

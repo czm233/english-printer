@@ -1,0 +1,61 @@
+name: Deploy product page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/index.html'
+      - 'docs/styles.css'
+      - 'docs/site.js'
+      - 'docs/assets/app-icon.png'
+      - 'docs/assets/app-print.png'
+      - 'docs/assets/app-chat.png'
+      - 'docs/assets/lifestyle.webp'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Prepare public files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -L docs
+          test ! -L docs/assets
+          mkdir -p _site/assets
+          for file in index.html styles.css site.js assets/app-icon.png assets/app-print.png assets/app-chat.png assets/lifestyle.webp; do
+            test -f "docs/$file"
+            test ! -L "docs/$file"
+            cp "docs/$file" "_site/$file"
+          done
+          touch _site/.nojekyll
+      - name: Upload product page only
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

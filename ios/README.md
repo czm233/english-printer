@@ -65,7 +65,7 @@ node scripts/archive-ios-symbols.mjs Release
 2026-10-12：已获授权同步当前 Web 界面及输入交互。原生 `/api/translate` 将双向请求适配到既有 MyMemory 服务；手机不使用 Mac 的百度本地凭证。Debug 包已构建，因配对手机不可用尚未覆盖安装；真机键盘及打印须安装后复测。
 
 
-2026-10-12：Debug 已同步按模型配置的低思考请求。`model-options.json` 随 Web 资源打包，`glm-5.3-flash` 显式传 `output_config.effort=low`，其他模型不追加。Mac 12次实测更快，但两次low出现infuser音标重音错误；详细方法、局限和复现实验见根目录README。
+2026-10-12：Debug 已同步按模型配置的低思考请求。`model-options.json` 随 Web 资源打包，`glm-5.3-flash` 显式传 `output_config.effort=low`，其他模型不追加。Mac 12次实测更快，但两次low出现infuser音标重音错误；详细方法、局限和复现实验见[开发指南](../docs/development.md#付费模型基准)。
 
 
 2026-10-12：ModelConfig独立为Swift文件并兼容旧Keychain数据，新增effort字段默认low；大模型设置支持low/high/max保存，现有密钥与历史继续保留。Debug构建通过，Web资源已与当前源码逐项核对。真机原生选择菜单和键盘交互仍需现场确认。

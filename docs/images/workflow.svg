@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+<title id="title">从中文到英文标签</title><desc id="desc">输入冰箱，选择 fridge 和对应音标，预览后手动确认，由德佟 P0 打印英文与音标标签。</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#8a9ab0" stroke-width="1.5"/></marker></defs>
+<rect width="960" height="360" rx="20" fill="#f4f7fc"/>
+<g font-family="-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" fill="#15243d">
+<text x="32" y="52" font-size="26" font-weight="600">从一个中文词，到一张英文标签</text>
+<g fill="#fff" stroke="#dce4ef" stroke-width="1.5"><rect x="32" y="100" width="196" height="158" rx="16"/><rect x="265" y="100" width="196" height="158" rx="16"/><rect x="498" y="100" width="196" height="158" rx="16"/><rect x="731" y="100" width="196" height="158" rx="16"/></g>
+<g fill="#6d7b92" font-size="19" text-anchor="middle"><text x="130" y="135">输入中文</text><text x="363" y="135">选词与核对音标</text><text x="596" y="135">预览后手动确认</text><text x="829" y="135">P0 蓝牙打印</text></g>
+<g font-size="29" text-anchor="middle"><text x="130" y="202">冰箱</text><text x="363" y="185">fridge</text><text x="363" y="221" font-size="25" fill="#6d7b92">/fɹɪdʒ/</text></g>
+<rect x="517" y="162" width="158" height="58" rx="12" fill="#1765ef"/><text x="596" y="200" fill="white" font-size="25" text-anchor="middle">确认打印</text>
+<rect x="753" y="160" width="152" height="70" rx="3" fill="#fff" stroke="#aebdd0" stroke-dasharray="4 3"/><g text-anchor="middle" fill="#1c2431" font-family="Arial,sans-serif" font-size="24"><text x="829" y="189">fridge</text><text x="829" y="218">/fɹɪdʒ/</text></g>
+<g stroke="#8a9ab0" stroke-width="2" marker-end="url(#arrow)"><path d="M235 180H255"/><path d="M468 180H488"/><path d="M701 180H721"/></g>
+<text x="32" y="311" font-size="18" fill="#6d7b92">AI 也可以帮助选词；生成卡片不会出纸，必须由你确认。</text><text x="928" y="338" font-size="15" fill="#6d7b92" text-anchor="end">标签为排版示意，非纸面实拍</text>
+</g></svg>
