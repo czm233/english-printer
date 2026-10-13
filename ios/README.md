@@ -54,6 +54,8 @@ node scripts/collect-ios-logs.mjs DEVICE_ID
 node scripts/archive-ios-symbols.mjs Debug
 # Release 构建后：
 node scripts/archive-ios-symbols.mjs Release
+# 模拟器 Debug 产物：
+node scripts/archive-ios-symbols.mjs Debug --simulator
 ```
 
 符号按 Mach-O UUID 保存在 `.local/diagnostics/symbols/`，属于 Mac 构建资料，不计入手机日志上限。源码和符号不自动上传。`MXMetricManager` 已订阅崩溃、卡顿、CPU、磁盘异常和内存汇总；报告由 iOS 提供，可能延迟或缺失。上次会话未正常关闭只表示需要排查，不能据此断言崩溃。系统强杀/内存回收可能需要另行检查本 App 的系统 `.ips` 报告；应用日志不能替代系统崩溃报告。没有安装此版之前的问题无法补记。

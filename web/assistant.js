@@ -1,7 +1,7 @@
 // Chat snapshots contain structured messages, never rendered HTML or credentials.
 (()=>{
 const el=id=>document.getElementById(id);
-let historyReady=false,pendingTurn=null,saveTimer,writeQueue=Promise.resolve();
+let historyReady=false,historyStale=false,pendingTurn=null,saveTimer,writeQueue=Promise.resolve();
 let saved={configured:false,keyConfigured:false,url:'',model:'',effort:'low'},modelOptions={},saving=false,chatBusy=false,controller=null,history=[],failedContent=null,waiting=null,failedBubble=null,composingChat=false;
 function settings(which){el('labelSettings').hidden=which!=='label';el('modelSettings').hidden=which!=='model';el('labelSettingsTab').setAttribute('aria-selected',String(which==='label'));el('modelSettingsTab').setAttribute('aria-selected',String(which==='model'));}
 el('labelSettingsTab').onclick=()=>settings('label');el('modelSettingsTab').onclick=()=>settings('model');
@@ -9,7 +9,7 @@ function openConfig(){tab('settings');settings('model')}
 el('configureModel').onclick=openConfig;
 function configError(text){el('configError').textContent=text;el('configError').hidden=!text;}
 async function localJson(path,options={}){let r;try{r=await fetch(path,options)}catch{throw Error('本机服务未连接，请重新启动项目。')}const data=await r.json();if(!r.ok)throw Error(data.error||'请求失败，请重试。');return data;}
-function update(){['apiUrl','apiKey','modelName','modelEffort'].forEach(id=>el(id).disabled=saving||chatBusy);el('configureModel').hidden=saved.configured;el('sendChat').setAttribute('aria-label',chatBusy?'停止':'发送');el('sendChat').firstElementChild.className='icon '+(chatBusy?'icon-stop':'icon-send');el('sendChat').disabled=!chatBusy&&(!historyReady||(!el('chatInput').value.trim()&&!P0ChatInput.photo)||!saved.configured||saving||P0ChatInput.pending);el('newChat').disabled=chatBusy||!historyReady;el('chatHistory').disabled=chatBusy||!historyReady;el('saveConfig').disabled=saving||chatBusy;el('retryChat').disabled=chatBusy||saving||!historyReady;P0ChatInput.lock(chatBusy||!historyReady);P0Choices.sync(!historyReady||chatBusy||saving||!saved.configured||P0ChatInput.pending||!!P0ChatInput.photo||!!el('chatInput').value.trim())}
+function update(){['apiUrl','apiKey','modelName','modelEffort'].forEach(id=>el(id).disabled=saving||chatBusy);el('configureModel').hidden=saved.configured;el('sendChat').setAttribute('aria-label',chatBusy?'停止':'发送');el('sendChat').firstElementChild.className='icon '+(chatBusy?'icon-stop':'icon-send');el('sendChat').disabled=!chatBusy&&(!historyReady||(!el('chatInput').value.trim()&&!P0ChatInput.photo)||!saved.configured||saving||P0ChatInput.pending);el('newChat').disabled=chatBusy||!historyReady;el('chatHistory').disabled=chatBusy||!historyReady;el('saveConfig').disabled=saving||chatBusy;el('retryChat').disabled=chatBusy||saving||!historyReady;P0ChatInput.lock(chatBusy||!historyReady);if(historyStale)el('chatInput').disabled=false;P0Choices.sync(!historyReady||chatBusy||saving||!saved.configured||P0ChatInput.pending||!!P0ChatInput.photo||!!el('chatInput').value.trim())}
 function syncEffort(){el('effortField').hidden=!Object.hasOwn(modelOptions,el('modelName').value.trim())}
 function applyConfig(c){saved=c;el('apiUrl').value=c.url||'';el('modelName').value=c.model||'';el('modelEffort').querySelectorAll('input').forEach(input=>input.checked=input.value===(c.effort||'low')); syncEffort();el('apiKey').value='';el('apiKey').placeholder=c.keyConfigured?'已保存，留空保留':'输入 API Key';update()}
 Promise.all([localJson('/api/config'),localJson('model-options.json')]).then(([c,options])=>{modelOptions=options;applyConfig(c)}).catch(e=>configError(e.message));
@@ -97,7 +97,7 @@ el('chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!
 // All snapshots are structured data. Restoration always uses the normal safe renderers.
 const sessions=new Map();let sessionId=crypto.randomUUID();
 function saveSession(){
- if(!history.length&&!failedContent&&!pendingTurn&&!el('chatInput').value.trim()&&!P0ChatInput.photo)return;
+ if(!history.length&&!failedContent&&!pendingTurn&&!el('chatInput').value.trim()&&!P0ChatInput.photo){sessions.delete(sessionId);return}
  const title=contentText(history[0]?.content||failedContent||pendingTurn?.content||el('chatInput').value||'照片对话').trim().slice(0,28)||'照片对话';
  sessions.set(sessionId,{title,history:structuredClone(history),failedContent,failedReply:failedBubble?._reply||'',pending:pendingTurn?structuredClone(pendingTurn):null,error:el('chatError').textContent,draft:P0ChatInput.snapshot()});
 }
@@ -107,11 +107,15 @@ function snapshot(){
  for(const card of cards)if(cardIds.has(card.id))for(const child of card.children||[])cardIds.add(child);
  return {version:1,current:sessionId,sessions:[...sessions],cards:cards.filter(c=>cardIds.has(c.id)),choices:P0Choices.snapshot().filter(([id])=>choiceIds.has(id))};
 }
-function persist(){
+function persist(options){
  if(!historyReady)return Promise.reject(Error('历史记录尚未加载，无法保存。'));
  clearTimeout(saveTimer);const value=snapshot();
- const run=writeQueue.catch(()=>{}).then(()=>P0ChatStore.save(value));writeQueue=run;
- run.catch(()=>feedback('历史记录保存失败，请检查存储空间后重试。'));
+ const run=writeQueue.catch(()=>{}).then(()=>P0ChatStore.save(value,options));writeQueue=run;
+ run.catch(error=>{
+  const stale=['HISTORY_CONFLICT','PRINT_ALREADY_CLAIMED'].includes(error.code);
+  if(stale){historyReady=false;historyStale=true;clearTimeout(saveTimer);update();P0PrintCards.sync()}
+  feedback(stale?error.message:'历史记录保存失败，请检查存储空间后重试。');
+ });
  return run;
 }
 function scheduleSave(){clearTimeout(saveTimer);if(historyReady)saveTimer=setTimeout(()=>persist().catch(()=>{}),350)}
@@ -146,7 +150,7 @@ function showHistory(){
 }
 el('chatHistory').onclick=showHistory;
 el('closeHistory').onclick=()=>el('historyDialog').close();
-window.P0History={persist};
+window.P0History={persist,get ready(){return historyReady}};
 document.addEventListener('chat-input-change',scheduleSave);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&historyReady)persist().catch(()=>{})});
 P0ChatStore.load().then(value=>{

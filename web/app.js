@@ -106,8 +106,30 @@ function showTyping(){if(!$('chinese').value.trim())return;if(direction==='en-zh
 function scheduleTranslation(){resetResult();showTyping();if(!composing&&$('chinese').value.trim()){translationTimer=setTimeout(translate,TRANSLATION_IDLE_MS)}}
 $('chinese').oncompositionstart=()=>{composing=true;resetResult();showTyping()};$('chinese').oncompositionend=()=>{composing=false;scheduleTranslation()};$('chinese').oninput=scheduleTranslation;$('clear').onclick=()=>{$('chinese').value='';resetResult();$('chinese').focus()};document.querySelectorAll('[data-text]').forEach(b=>b.onclick=()=>{$('chinese').value=b.dataset.text;scheduleTranslation()});
 ['word','ipa'].forEach(id=>$(id).oninput=()=>{hasResult=!!translatedSource;$('sampleWord').value=$('word').value;$('sampleIpa').value=$('ipa').value;message(canSplitCurrent()?'':validate($('word').value,$('ipa').value),true);draw()});ids.forEach(id=>$(id).oninput=draw);
-function editLabel(){setPhoneticsLoading(false);$('translationPending').hidden=true;$('word').hidden=false;clearOptions();stopSpeech();clearTimeout(translationTimer);revision++;translating=false;$('translatePrint').hidden=true;$('word').value=$('sampleWord').value;$('ipa').value=P0Phonetics.format($('sampleIpa').value);hasResult=!!$('word').value.trim();if(direction==='en-zh'){$('chinese').value=$('word').value;$('sourceIpa').textContent=$('ipa').value;translateMeaning(revision,$('word').value.trim())}message(canSplitCurrent()?'':validate($('word').value,$('ipa').value),true);draw()}
-['sampleWord','sampleIpa'].forEach(id=>$(id).oninput=editLabel);$('sampleIpa').onblur=()=>{const ipa=P0Phonetics.format($('sampleIpa').value).slice(1,-1);$('sampleIpa').value=ipa?'/'+ipa+'/':'';editLabel()};
+async function editLabel(wordChanged=false){
+ const current=++revision,source=$('sampleWord').value.trim();
+ setPhoneticsLoading(false);$('translationPending').hidden=true;$('word').hidden=false;clearOptions();stopSpeech();clearTimeout(translationTimer);meaningRevision++;translating=wordChanged&&!!source;$('translatePrint').hidden=true;
+ // A pronunciation belongs to the English that produced it. Explicit IPA edits
+ // remain supported, but changing the word must invalidate the previous pair.
+ if(wordChanged)$('sampleIpa').value='';
+ $('word').value=$('sampleWord').value;$('ipa').value=P0Phonetics.format($('sampleIpa').value);hasResult=!!source&&!!$('ipa').value;
+ if(direction==='en-zh'){
+  $('chinese').value=$('word').value;$('sourceIpa').textContent=$('ipa').value;setPhoneticsLoading(translating);
+  if(source)translateMeaning(current,source);else setMeaning('');
+ }
+ message(translating?'':canSplitCurrent()?'':validate($('word').value,$('ipa').value),true);draw();
+ if(!wordChanged||!source)return;
+ try{
+  const ipa=await phonetics(source);
+  if(current!==revision)return;
+  $('ipa').value=$('sampleIpa').value=ipa;hasResult=!!ipa;
+  if(direction==='en-zh')$('sourceIpa').textContent=ipa;
+  const error=ipa?(canSplitCurrent()?'':validate(source,ipa)):'请检查英文拼写';message(error,!!error);
+ }catch{if(current===revision)message('音标词典加载失败，请重试。',true)}
+ finally{if(current===revision){translating=false;setPhoneticsLoading(false);draw()}}
+}
+$('sampleWord').oninput=()=>editLabel(true);$('sampleIpa').oninput=()=>editLabel();
+$('sampleIpa').onblur=()=>{const ipa=P0Phonetics.format($('sampleIpa').value);if(ipa!==$('sampleIpa').value){$('sampleIpa').value=ipa;editLabel()}};
 let speechGeneration=0,activeUtterance=null;
 function stopSpeech(){speechGeneration++;if('speechSynthesis' in window)window.speechSynthesis.cancel();activeUtterance=null;$('speak').innerHTML='<i class="icon icon-volume" aria-hidden="true"></i>';$('speak').setAttribute('aria-pressed','false')}
 $('speak').onclick=()=>{if(activeUtterance){stopSpeech();return}const text=$('word').value.trim();if(!text||!hasResult)return;stopSpeech();const generation=speechGeneration;const utterance=new SpeechSynthesisUtterance(text);activeUtterance=utterance;utterance.lang='en-US';utterance.rate=0.85;const voices=speechSynthesis.getVoices();const voice=voices.find(v=>v.lang.toLowerCase()==='en-us'&&v.localService)||voices.find(v=>v.lang.toLowerCase()==='en-us');if(voice)utterance.voice=voice;$('speak').innerHTML='<i class="icon icon-stop" aria-hidden="true"></i>';$('speak').setAttribute('aria-pressed','true');const done=()=>{if(generation!==speechGeneration)return;activeUtterance=null;$('speak').innerHTML='<i class="icon icon-volume" aria-hidden="true"></i>';$('speak').setAttribute('aria-pressed','false')};utterance.onend=done;utterance.onerror=e=>{if(generation!==speechGeneration)return;done();if(e.error!=='canceled'&&e.error!=='interrupted')message('朗读失败，请检查设备语音设置后重试。',true)};speechSynthesis.speak(utterance)};

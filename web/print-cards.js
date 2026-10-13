@@ -19,7 +19,7 @@ function sync(){
    }).catch(()=>{if(c.planKey===key)c.splitError='无法拆分，请缩小字号或缩短英文。'}).finally(()=>{if(c.planKey===key){c.planning=false;sync()}});
   }
   button.hidden=c.state==='split';
-  button.disabled=c.used||busy||deviceBusy||!!validation&&!(needsSplit&&c.plan);
+  button.disabled=c.used||busy||deviceBusy||window.P0History?.ready===false||!!validation&&!(needsSplit&&c.plan);
   const completed=(c.children||[]).filter(id=>cards.get(id)?.state==='printed').length;
   button.textContent=c.batch?`拆分打印(${completed}/${c.children.length})`:needsSplit?(c.plan?`拆分打印(0/${c.plan.length})`:c.planning?'正在计算…':'拆分打印'):c.used?(c.state==='printing'?'打印中…':'已确认'):'确认打印';
   if(!c.batch)for(const id of c.children||[]){if(!node.querySelector('[data-print-card="'+id+'"]'))render(id,node,false)}
@@ -85,7 +85,7 @@ async function confirmBatch(c){
  try{
   if(!window.P0History)throw Error('历史记录尚未就绪，未发送打印。');
   // Lock the parent and every UUID durably before the first device request.
-  await P0History.persist();
+  await P0History.persist({claim:c.id});
   for(const id of c.children){
    const part=cards.get(id);part.state='printing';part.status='打印结果未确认，请先检查出纸。';
    await P0History.persist();
@@ -104,12 +104,12 @@ async function confirmBatch(c){
  finally{busy=false;refresh();window.P0History?.persist().catch(()=>{})}
 }
 async function confirm(id){
- const c=cards.get(id);if(!c||c.used||busy||deviceBusy)return;
+ const c=cards.get(id);if(!c||c.used||busy||deviceBusy||!window.P0History?.ready)return;
  if(c.plan)return confirmBatch(c);
  // Consume before any await, including validation. Failure never re-enables this card.
  c.used=true;c.state='printing';c.status='正在检查并打印…';busy=true;refresh();sync();
  try{
-  await window.P0History?.persist();
+  await P0History.persist({claim:c.id});
   const error=validate(c.word,c.ipa);if(error)throw Error(error);
   const response=await printerRequest('print',{requestId:c.id,word:c.word,ipa:c.ipa,settings:config()});
   setConnection(response.device);

@@ -2,9 +2,10 @@ import Foundation
 import CoreBluetooth
 final class Probe: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
  var central: CBCentralManager!; var printer: CBPeripheral?; var pending = 0; var writer: CBCharacteristic?; var receiver: CBCharacteristic?
+ let target = UUID(uuidString: (ProcessInfo.processInfo.environment["P0_DEVICE_ID"] ?? ((try? String(contentsOfFile: "../.local/printer-device-id", encoding: .utf8)) ?? "")).trimmingCharacters(in: .whitespacesAndNewlines))
  func start() { central = CBCentralManager(delegate:self, queue:nil); DispatchQueue.main.asyncAfter(deadline:.now()+25) { print("ERROR: Bluetooth operation timed out"); exit(7) } }
  func centralManagerDidUpdateState(_ c:CBCentralManager) { print("Bluetooth state: \(c.state.rawValue)"); if c.state == .poweredOn { c.scanForPeripherals(withServices:nil) } else if c.state == .unauthorized { print("Bluetooth permission required"); exit(2) } }
- func centralManager(_ c:CBCentralManager,didDiscover p:CBPeripheral,advertisementData:[String:Any],rssi:NSNumber) { let name=p.name ?? advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? ""; if p.identifier.uuidString == (ProcessInfo.processInfo.environment["P0_DEVICE_ID"] ?? ((try? String(contentsOfFile: "../.local/printer-device-id", encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)) { print("Found printer: \(name) \(p.identifier)"); if printer == nil { printer=p; c.stopScan(); p.delegate=self; c.connect(p) } } }
+ func centralManager(_ c:CBCentralManager,didDiscover p:CBPeripheral,advertisementData:[String:Any],rssi:NSNumber) { let name=p.name ?? advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? ""; if p.identifier == target { print("Found printer: \(name) \(p.identifier)"); if printer == nil { printer=p; c.stopScan(); p.delegate=self; c.connect(p) } } }
  func centralManager(_ c:CBCentralManager,didConnect p:CBPeripheral) { print("CONNECTED"); p.discoverServices(nil) }
  func centralManager(_ c:CBCentralManager,didFailToConnect p:CBPeripheral,error:Error?) { print("Connection failed: \(String(describing:error))"); exit(3) }
  func peripheral(_ p:CBPeripheral,didDiscoverServices error:Error?) { for s in p.services ?? [] { print("Service \(s.uuid)"); pending += 1; p.discoverCharacteristics(nil,for:s) } }

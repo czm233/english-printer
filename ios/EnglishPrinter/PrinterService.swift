@@ -10,7 +10,13 @@ import CryptoKit
     var connectWaiter: CheckedContinuation<Void,Error>?, writeWaiter: CheckedContinuation<Void,Error>?
     var connectTimeout: DispatchWorkItem?, writeTimeout: DispatchWorkItem?
     var packets: [Data] = [], packetIndex = 0
-    var queries: [Int:CheckedContinuation<[String:Any],Error>] = [:]
+    struct PendingQuery {
+        let id: UUID
+        let continuation: CheckedContinuation<[String:Any],Error>
+        var packet: [String:Any]?
+        var written = false
+    }
+    var queries: [Int:PendingQuery] = [:]
     var queryTimeouts: [Int:DispatchWorkItem] = [:]
     var pageKey = Int.random(in:1..<65000)
     let service = CBUUID(string:"49535343-FE7D-4AE5-8FA9-9FAFD205E455")
@@ -44,7 +50,7 @@ import CryptoKit
         let error = appError(message)
         connectWaiter?.resume(throwing:error);connectWaiter = nil
         writeWaiter?.resume(throwing:error);writeWaiter = nil;packets = []
-        let waiting = queries;queries = [:];waiting.values.forEach {$0.resume(throwing:error)}
+        let waiting = queries;queries = [:];waiting.values.forEach {$0.continuation.resume(throwing:error)}
         queryTimeouts.values.forEach {$0.cancel()};queryTimeouts = [:]
     }
     func disconnect() throws {
@@ -69,17 +75,27 @@ import CryptoKit
     }
     func query(_ command: Int) async throws -> [String:Any] {
         guard queries[command] == nil else {throw appError("设备正在查询状态。")}
-        let data = try codec.command(command)
+        let data = try codec.command(command), id = UUID()
         return try await withCheckedThrowingContinuation { continuation in
-            queries[command] = continuation
-            let timeout = DispatchWorkItem { [weak self] in self?.finishQuery(command,error:appError("打印机未返回状态，请重连。")) }
+            queries[command] = PendingQuery(id:id,continuation:continuation)
+            let timeout = DispatchWorkItem { [weak self] in self?.finishQuery(command,id:id,error:appError("打印机未返回状态，请重连。")) }
             queryTimeouts[command] = timeout;DispatchQueue.main.asyncAfter(deadline:.now()+4,execute:timeout)
-            Task {do {try await write(data)} catch {finishQuery(command,error:error)}}
+            Task {do {try await write(data);finishQuery(command,id:id,written:true)} catch {finishQuery(command,id:id,error:error)}}
         }
     }
-    func finishQuery(_ command: Int,packet: [String:Any]? = nil,error: Error? = nil) {
+    func finishQuery(_ command: Int,id: UUID? = nil,packet: [String:Any]? = nil,written: Bool = false,error: Error? = nil) {
+        guard var query = queries[command], id == nil || query.id == id else {return}
+        if let error = error {
+            queries.removeValue(forKey:command);queryTimeouts.removeValue(forKey:command)?.cancel()
+            query.continuation.resume(throwing:error);return
+        }
+        if let packet = packet {query.packet = packet}
+        if written {query.written = true}
+        // A notification can precede didWriteValueFor. Do not release the next query until both arrive.
+        guard query.written, let response = query.packet else {queries[command] = query;return}
+        queries.removeValue(forKey:command)
         queryTimeouts.removeValue(forKey:command)?.cancel()
-        if let q = queries.removeValue(forKey:command) {if let packet = packet {q.resume(returning:packet)} else {q.resume(throwing:error ?? appError("状态无效。"))}}
+        query.continuation.resume(returning:response)
     }
     func refresh() async throws -> [Int] {
         let packet = try await query(112);guard let data = packet["data"] as? [Int], let first = data.first else {throw appError("打印机状态无效。")}

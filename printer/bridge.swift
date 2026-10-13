@@ -19,7 +19,7 @@ final class Bridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     var timer: DispatchWorkItem?
     var chunks: [Data] = []
     var index = 0
-    let target = ProcessInfo.processInfo.environment["P0_DEVICE_ID"] ?? ((try? String(contentsOfFile: ".local/printer-device-id", encoding: .utf8)) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    let target = UUID(uuidString: (ProcessInfo.processInfo.environment["P0_DEVICE_ID"] ?? ((try? String(contentsOfFile: ".local/printer-device-id", encoding: .utf8)) ?? "")).trimmingCharacters(in: .whitespacesAndNewlines))
 
     func start() { central = CBCentralManager(delegate: self, queue: nil) }
     func reply(_ id: String, error: String? = nil) {
@@ -37,7 +37,7 @@ final class Bridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     }
     func beginConnect() {
         guard connectID != nil else { return }
-        guard UUID(uuidString: target) != nil else { lost("请配置 P0_DEVICE_ID 或 .local/printer-device-id。"); return }
+        guard target != nil else { lost("请配置 P0_DEVICE_ID 或 .local/printer-device-id。"); return }
         if central.state == .poweredOn {
             central.scanForPeripherals(withServices: nil)
         } else if central.state == .poweredOff { lost("请开启 Mac 蓝牙。") }
@@ -81,7 +81,7 @@ final class Bridge: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         beginConnect()
     }
     func centralManager(_ central: CBCentralManager, didDiscover p: CBPeripheral, advertisementData: [String: Any], rssi: NSNumber) {
-        guard connectID != nil, p.identifier.uuidString == target else { return }
+        guard connectID != nil, p.identifier == target else { return }
         central.stopScan(); printer = p; p.delegate = self; central.connect(p)
     }
     func centralManager(_ central: CBCentralManager, didConnect p: CBPeripheral) {

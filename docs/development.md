@@ -104,6 +104,8 @@ node tests/acceptance.mjs
 npm install --prefix .local/browser-test-tools playwright
 export PLAYWRIGHT_MODULE="$PWD/.local/browser-test-tools/node_modules/playwright"
 node tests/history.browser.cjs
+node tests/history-concurrency.browser.cjs
+node tests/settings-phonetics.browser.cjs
 node tests/option-batch.browser.cjs
 node tests/split-cards.browser.cjs
 node tests/direct-choice.browser.cjs
@@ -128,6 +130,7 @@ node tests/site.browser.cjs
 - 模型 Markdown 先清洗再写入 DOM；工具事件独立解析，流中断或参数不完整时不能生成可打印卡片。
 - AI 只创建确认卡片。单张与拆分批次都由可信用户点击触发；批次上一张完成才发送下一张，失败或不确定时立即停止。
 - AI 卡片与子 UUID 在下发前持久锁定；保存失败不得发送。历史恢复不能自动续打、解锁或丢掉消费状态。
+- Web 历史在 IndexedDB 单个读写事务中检查版本、保存快照和消费标记；旧标签页写入冲突时停止保存与卡片操作，不能重置版本后强行覆盖。消费标记独立于会话快照保留，避免旧快照回写解除锁定；不记录用户内容。
 - 设备请求按 UUID 持久防重。日志、重启和错误处理都不能触发自动补打。
 - 主页面音标须对应完整英文；未知词不拼出部分结果。词组统一空格分隔、整段一对斜杠，兼容旧分号输入。
 - 历史保存结构化数据，恢复时重新清洗；读取失败不能用空历史覆盖。照片和用户内容不得进入诊断日志。
