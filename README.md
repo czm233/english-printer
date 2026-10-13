@@ -18,10 +18,17 @@ iPhone App 首次构建安装仍需 **Mac、Xcode 和自己的开发者账号**�
 
 下面是作者的实际使用记录：P0 打印英文与音标标签，以及在 iPhone 上上传物品照片，让 AI 帮助选词并生成待确认卡片。
 
-| P0 与实际打印的标签 | iPhone 照片识物与选词 |
-| --- | --- |
-| ![德佟 P0 与实际打印出的 Good morning、fridge 和 Mouse Pad 英文音标标签](docs/images/p0-real-print.jpg) | ![iPhone 中上传水壶照片，AI 建议 pitcher 并生成待确认打印卡片](docs/images/iphone-photo-to-label.jpg) |
-| 实物标签包含 Good morning、fridge 和 Mouse Pad，英文与音标各占一行。 | 上传照片询问英文表达，得到 pitcher 和音标，点击“确认打印”后才会下发。 |
+### P0 与实际打印的标签
+
+![德佟 P0 与实际打印出的 Good morning、fridge 和 Mouse Pad 英文音标标签](docs/images/p0-real-print.jpg)
+
+实物标签包含 Good morning、fridge 和 Mouse Pad，英文与音标各占一行。
+
+### iPhone 照片识物与选词
+
+![iPhone 中上传水壶照片，AI 建议 pitcher 并生成待确认打印卡片](docs/images/iphone-photo-to-label.jpg)
+
+上传照片询问英文表达，得到 pitcher 和音标，点击“确认打印”后才会下发。
 
 [查看出纸原图](docs/images/p0-real-print.jpg) · [查看手机截图原图](docs/images/iphone-photo-to-label.jpg)
 
@@ -143,6 +150,6 @@ GitHub Pages 工作流只打包首页、样式、交互脚本和明确列出的�
 
 ## 许可证与致谢
 
-仓库目前尚未提供项目级 `LICENSE`，未声明整体开源许可。
+本项目采用 [MIT 许可证](LICENSE)，允许使用、修改、分发和商用，须保留版权与许可声明。
 
-本地发音词典、图标及浏览器依赖的许可分别见 [CMU](web/CMU-LICENSE.txt)、[CMUdict](web/CMUDICT-LICENSE.txt)、[Tabler Icons](web/icons/LICENSE.txt) 和 [vendor](web/vendor/README.txt)；第三方许可不代表整个项目的授权范围。
+第三方组件仍遵循各自的许可证：本地发音词典、图标及浏览器依赖的许可分别见 [CMU](web/CMU-LICENSE.txt)、[CMUdict](web/CMUDICT-LICENSE.txt)、[Tabler Icons](web/icons/LICENSE.txt) 和 [vendor](web/vendor/README.txt)。
