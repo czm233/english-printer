@@ -130,10 +130,9 @@ async function editLabel(wordChanged=false){
 }
 $('sampleWord').oninput=()=>editLabel(true);$('sampleIpa').oninput=()=>editLabel();
 $('sampleIpa').onblur=()=>{const ipa=P0Phonetics.format($('sampleIpa').value);if(ipa!==$('sampleIpa').value){$('sampleIpa').value=ipa;editLabel()}};
-let speechGeneration=0,activeUtterance=null;
-function stopSpeech(){speechGeneration++;if('speechSynthesis' in window)window.speechSynthesis.cancel();activeUtterance=null;$('speak').innerHTML='<i class="icon icon-volume" aria-hidden="true"></i>';$('speak').setAttribute('aria-pressed','false')}
-$('speak').onclick=()=>{if(activeUtterance){stopSpeech();return}const text=$('word').value.trim();if(!text||!hasResult)return;stopSpeech();const generation=speechGeneration;const utterance=new SpeechSynthesisUtterance(text);activeUtterance=utterance;utterance.lang='en-US';utterance.rate=0.85;const voices=speechSynthesis.getVoices();const voice=voices.find(v=>v.lang.toLowerCase()==='en-us'&&v.localService)||voices.find(v=>v.lang.toLowerCase()==='en-us');if(voice)utterance.voice=voice;$('speak').innerHTML='<i class="icon icon-stop" aria-hidden="true"></i>';$('speak').setAttribute('aria-pressed','true');const done=()=>{if(generation!==speechGeneration)return;activeUtterance=null;$('speak').innerHTML='<i class="icon icon-volume" aria-hidden="true"></i>';$('speak').setAttribute('aria-pressed','false')};utterance.onend=done;utterance.onerror=e=>{if(generation!==speechGeneration)return;done();if(e.error!=='canceled'&&e.error!=='interrupted')message('朗读失败，请检查设备语音设置后重试。',true)};speechSynthesis.speak(utterance)};
-['word','ipa'].forEach(id=>$(id).addEventListener('input',stopSpeech));window.addEventListener('pagehide',stopSpeech);
+function stopSpeech(){if(typeof P0Speech!=='undefined'&&P0Speech.stop)P0Speech.stop();else if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+$('speak').onclick=()=>{if($('speak').disabled)return;const text=$('word').value.trim();if(!text||!hasResult)return;if(typeof P0Speech!=='undefined'&&P0Speech.speak){P0Speech.speak(text,$('speak'),{toggle:true,onError:()=>message('朗读失败，请检查设备语音设置后重试。',true)})}};
+['word','ipa','sampleWord'].forEach(id=>$(id)?.addEventListener('input',stopSpeech));window.addEventListener('pagehide',stopSpeech);
 document.querySelector('.input-block>.entry').addEventListener('click',e=>{if(e.target!==$('chinese')&&!$('chinese').disabled)$('chinese').focus()});
 function centerChinese(){const input=$('chinese');if(!input.getClientRects().length)return;input.style.height='0px';input.style.height=input.scrollHeight+'px'}
 window.addEventListener('resize',centerChinese);$('chinese').addEventListener('input',centerChinese);
