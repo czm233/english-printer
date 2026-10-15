@@ -38,7 +38,7 @@ function setButtonState(btn,playing){
  btn.innerHTML=`<i class="icon icon-volume" aria-hidden="true"></i>`;
  const isSpeak=btn.id==='speak',isSample=btn.id==='speakSample',text=btn.dataset?.speakText||'';
  if(playing){
-  if(isSpeak)btn.setAttribute('aria-label','停止朗读');
+  if(isSpeak)btn.setAttribute('aria-label','正在朗读英文');
   else if(isSample)btn.setAttribute('aria-label','正在朗读预览英文');
   else if(text)btn.setAttribute('aria-label','正在朗读 '+text);
  }else{
@@ -71,14 +71,12 @@ function isPlaying(){
  return !!activeUtterance||(activeButton&&activeButton.getAttribute('aria-pressed')==='true');
 }
 
-function speak(text,button=null,{toggle=false,onError=null}={}){
+function speak(text,button=null,{onError=null}={}){
  const rawText=typeof text==='string'?text.trim():'';
  if(!rawText||!('speechSynthesis' in window))return;
 
- if(toggle&&isPlaying()&&button&&activeButton===button){
-  stop();
-  return;
- }
+ // Repeat click on the button that is already playing: keep playing (no stop, no replay).
+ if(isPlaying()&&button&&activeButton===button)return;
 
  speechGeneration++;
  clearTimeout(watchdogTimer);

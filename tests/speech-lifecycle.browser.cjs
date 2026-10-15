@@ -124,7 +124,7 @@ const { spawn } = require('node:child_process');
 
     // Immediate active state verification: speaker icon is KEPT while playing
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'true');
-    assert.equal(await speakBtn.getAttribute('aria-label'), '停止朗读');
+    assert.equal(await speakBtn.getAttribute('aria-label'), '正在朗读英文');
     assert.ok(await speakBtn.locator('i.icon-volume').count() === 1, 'Playing button must keep the volume icon');
     assert.ok(await speakBtn.locator('i.icon-stop').count() === 0, 'Playing button must NOT swap to a square stop icon');
     assert.ok(await speakBtn.evaluate(el => el.classList.contains('speaking')), 'Playing button must have speaking class');
@@ -155,15 +155,19 @@ const { spawn } = require('node:child_process');
     assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Finished button must drop speaking class');
     assert.equal(await speakBtn.evaluate(el => getComputedStyle(el, '::before').animationName), 'none', 'Ripple must stop after completion');
 
-    // 3. Toggle behavior on active #speak
+    // 3. Quick repeat click while playing: audio must NOT stop and NOT replay
     await speakBtn.click();
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'true');
-    // Clicking while active should toggle stop
-    await speakBtn.click();
+    const speakCountBeforeRepeat = await page.evaluate(() => window.fakeSpeech.speakCount);
+    const cancelCountBeforeRepeat = await page.evaluate(() => window.fakeSpeech.cancelCount);
+    await speakBtn.click(); // quick second click on the same button
+    assert.equal(await speakBtn.getAttribute('aria-pressed'), 'true', 'Repeat click must keep playing');
+    assert.ok(await speakBtn.evaluate(el => el.classList.contains('speaking')), 'Repeat click must keep speaking state');
+    assert.equal(await page.evaluate(() => window.fakeSpeech.speakCount), speakCountBeforeRepeat, 'Repeat click must not re-speak');
+    assert.equal(await page.evaluate(() => window.fakeSpeech.cancelCount), cancelCountBeforeRepeat, 'Repeat click must not cancel');
+    await page.evaluate(() => window.fakeSpeech.currentUtterance.onend());
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'false');
-    assert.ok(await speakBtn.locator('i.icon-volume').count() === 1);
     assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Toggled-off button must drop speaking class');
-    assert.ok(await page.evaluate(() => window.fakeSpeech.cancelCount > 0), 'Toggle stop must call cancel');
 
     // 4. Error handling
     await speakBtn.click();
@@ -213,10 +217,12 @@ const { spawn } = require('node:child_process');
     const expectedSample = await page.locator('#sampleWord').inputValue();
     assert.equal(await page.evaluate(() => window.fakeSpeech.currentUtterance.text), expectedSample);
 
-    // Clicking #speakSample again replaces and replays
+    // Clicking #speakSample again while playing must be ignored (no stop, no replay)
     const sampleSpeakCountBefore = await page.evaluate(() => window.fakeSpeech.speakCount);
+    const sampleCancelCountBefore = await page.evaluate(() => window.fakeSpeech.cancelCount);
     await sampleBtn.click();
-    assert.equal(await page.evaluate(() => window.fakeSpeech.speakCount), sampleSpeakCountBefore + 1);
+    assert.equal(await page.evaluate(() => window.fakeSpeech.speakCount), sampleSpeakCountBefore, 'Repeat click on sample must not re-speak');
+    assert.equal(await page.evaluate(() => window.fakeSpeech.cancelCount), sampleCancelCountBefore, 'Repeat click on sample must not cancel');
     assert.equal(await sampleBtn.getAttribute('aria-pressed'), 'true');
     await page.evaluate(() => window.fakeSpeech.currentUtterance.onend());
     assert.equal(await sampleBtn.getAttribute('aria-pressed'), 'false');
@@ -285,7 +291,7 @@ const { spawn } = require('node:child_process');
     await unsupportedPage.close();
 
     assert.deepEqual(errors, [], 'No unexpected page errors');
-    console.log('PASS speech lifecycle: clean start (no cancel), speaker icon kept with ripple animation while playing, watchdog recovery, toggle, preemption, visibilitychange, unsupported fallback.');
+    console.log('PASS speech lifecycle: clean start (no cancel), speaker icon kept with ripple animation while playing, repeat click ignored while playing, watchdog recovery, preemption, visibilitychange, unsupported fallback.');
   } finally {
     await browser.close();
     if (serverProcess) {
