@@ -122,38 +122,40 @@ const { spawn } = require('node:child_process');
     assert.equal(await page.evaluate(() => window.fakeSpeech.speakCount), 1);
     assert.equal(await page.evaluate(() => window.fakeSpeech.currentUtterance.text), 'good morning');
 
-    // Immediate active state verification: speaker icon is KEPT while playing
+    // Immediate active state verification: animated equalizer bars while playing
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'true');
     assert.equal(await speakBtn.getAttribute('aria-label'), '正在朗读英文');
-    assert.ok(await speakBtn.locator('i.icon-volume').count() === 1, 'Playing button must keep the volume icon');
+    assert.ok(await speakBtn.locator('i.icon-speaking').count() === 1, 'Playing button must show the equalizer icon');
+    assert.equal(await speakBtn.locator('i.icon-speaking b').count(), 3, 'Playing icon must contain 3 bars');
+    assert.ok(await speakBtn.locator('i.icon-volume').count() === 0, 'Playing button must not keep the idle volume icon');
     assert.ok(await speakBtn.locator('i.icon-stop').count() === 0, 'Playing button must NOT swap to a square stop icon');
     assert.ok(await speakBtn.evaluate(el => el.classList.contains('speaking')), 'Playing button must have speaking class');
+    const barAnim = await speakBtn.locator('i.icon-speaking b').first().evaluate(el => {
+      const s = getComputedStyle(el);
+      return { name: s.animationName, duration: s.animationDuration, count: s.animationIterationCount };
+    });
+    assert.equal(barAnim.name, 'speech-bar', 'Bars must actually animate while playing');
+    assert.equal(barAnim.duration, '1s');
+    assert.equal(barAnim.count, 'infinite');
 
-    // Verify visual design token styling and animated playing feedback on playing button
+    // Verify visual design token styling on playing button
     const styles = await speakBtn.evaluate(el => {
       const s = getComputedStyle(el);
       return {
         color: s.color,
         background: s.backgroundColor,
-        boxShadow: s.boxShadow,
-        iconAnimation: getComputedStyle(el.querySelector('.icon')).animationName,
-        rippleAnimation: getComputedStyle(el, '::before').animationName,
-        rippleBorder: getComputedStyle(el, '::before').borderTopColor
+        boxShadow: s.boxShadow
       };
     });
     assert.ok(styles.boxShadow.includes('2px'), 'Active button must have ring box-shadow');
-    assert.equal(styles.iconAnimation, 'speech-pulse', 'Playing icon must pulse');
-    assert.equal(styles.rippleAnimation, 'speech-ripple', 'Playing button must show expanding ripple rings');
-    assert.ok(styles.rippleBorder.includes('23, 101, 239') || styles.rippleBorder.includes('rgb(23, 101, 239)'), 'Ripple rings must use accent color');
 
     // 2. Normal completion (onend)
     await page.evaluate(() => window.fakeSpeech.currentUtterance.onend());
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'false');
     assert.equal(await speakBtn.getAttribute('aria-label'), '朗读英文');
     assert.ok(await speakBtn.locator('i.icon-volume').count() === 1);
-    assert.ok(await speakBtn.locator('i.icon-stop').count() === 0);
+    assert.ok(await speakBtn.locator('i.icon-speaking').count() === 0, 'Finished button must drop the equalizer icon');
     assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Finished button must drop speaking class');
-    assert.equal(await speakBtn.evaluate(el => getComputedStyle(el, '::before').animationName), 'none', 'Ripple must stop after completion');
 
     // 3. Quick repeat click while playing: audio must NOT stop and NOT replay
     await speakBtn.click();
@@ -212,8 +214,7 @@ const { spawn } = require('node:child_process');
     await sampleBtn.click();
     assert.equal(await sampleBtn.getAttribute('aria-pressed'), 'true');
     assert.equal(await sampleBtn.getAttribute('aria-label'), '正在朗读预览英文');
-    assert.ok(await sampleBtn.locator('i.icon-volume').count() === 1, 'Sample button must keep volume icon while playing');
-    assert.equal(await sampleBtn.evaluate(el => getComputedStyle(el, '::before').animationName), 'speech-ripple', 'Sample button must show ripple while playing');
+    assert.ok(await sampleBtn.locator('i.icon-speaking').count() === 1, 'Sample button must show the equalizer icon while playing');
     const expectedSample = await page.locator('#sampleWord').inputValue();
     assert.equal(await page.evaluate(() => window.fakeSpeech.currentUtterance.text), expectedSample);
 
@@ -279,6 +280,17 @@ const { spawn } = require('node:child_process');
     await page.evaluate(() => window.fakeSpeech.currentUtterance.onend());
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'false');
 
+    // 9.5 Reduced motion: bars must not animate
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await speakBtn.click();
+    assert.equal(await speakBtn.getAttribute('aria-pressed'), 'true');
+    assert.equal(await speakBtn.locator('i.icon-speaking b').count(), 3, 'Reduced motion keeps static bars');
+    const rmAnim = await speakBtn.locator('i.icon-speaking b').first().evaluate(el => getComputedStyle(el).animationName);
+    assert.equal(rmAnim, 'none', 'Reduced motion must disable the bar animation');
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.evaluate(() => window.fakeSpeech.currentUtterance.onend());
+    assert.equal(await speakBtn.getAttribute('aria-pressed'), 'false');
+
     // 10. Unsupported browser verification
     const unsupportedPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
     await unsupportedPage.addInitScript(() => {
@@ -291,7 +303,7 @@ const { spawn } = require('node:child_process');
     await unsupportedPage.close();
 
     assert.deepEqual(errors, [], 'No unexpected page errors');
-    console.log('PASS speech lifecycle: clean start (no cancel), speaker icon kept with ripple animation while playing, repeat click ignored while playing, watchdog recovery, preemption, visibilitychange, unsupported fallback.');
+    console.log('PASS speech lifecycle: clean start (no cancel), animated equalizer bars while playing, repeat click ignored while playing, watchdog recovery, preemption, visibilitychange, reduced motion, unsupported fallback.');
   } finally {
     await browser.close();
     if (serverProcess) {

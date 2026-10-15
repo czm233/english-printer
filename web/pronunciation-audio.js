@@ -35,7 +35,9 @@ function setButtonState(btn,playing){
  if(!btn)return;
  btn.setAttribute('aria-pressed',playing?'true':'false');
  btn.classList.toggle('speaking',playing);
- btn.innerHTML=`<i class="icon icon-volume" aria-hidden="true"></i>`;
+ btn.innerHTML=playing
+  ?'<i class="icon icon-speaking" aria-hidden="true"><b></b><b></b><b></b></i>'
+  :'<i class="icon icon-volume" aria-hidden="true"></i>';
  const isSpeak=btn.id==='speak',isSample=btn.id==='speakSample',text=btn.dataset?.speakText||'';
  if(playing){
   if(isSpeak)btn.setAttribute('aria-label','正在朗读英文');
