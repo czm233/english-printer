@@ -34,7 +34,8 @@ function safeCancel(){
 function setButtonState(btn,playing){
  if(!btn)return;
  btn.setAttribute('aria-pressed',playing?'true':'false');
- btn.innerHTML=`<i class="icon icon-${playing?'stop':'volume'}" aria-hidden="true"></i>`;
+ btn.classList.toggle('speaking',playing);
+ btn.innerHTML=`<i class="icon icon-volume" aria-hidden="true"></i>`;
  const isSpeak=btn.id==='speak',isSample=btn.id==='speakSample',text=btn.dataset?.speakText||'';
  if(playing){
   if(isSpeak)btn.setAttribute('aria-label','停止朗读');

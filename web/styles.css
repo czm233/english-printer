@@ -71,9 +71,13 @@ button,.primary,.secondary,.speak,.input-head>.speak,.eyebrow>.speak,.device but
 .icon-button:active{background:#dce9ff}.icon-button .icon{width:26px;height:26px}
 .icon-button[aria-pressed="true"]{color:var(--accent);background:#eaf1ff;box-shadow:0 0 0 2px #d3e3ff}
 .icon-button[aria-pressed="true"]:active{background:#dbe8ff}
-.icon-button[aria-pressed="true"] .icon{animation:speech-pulse 1.2s ease-in-out infinite}
-@keyframes speech-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-@media (prefers-reduced-motion:reduce){.icon-button[aria-pressed="true"] .icon{animation:none}}
+.icon-button.speaking{position:relative}
+.icon-button.speaking::before,.icon-button.speaking::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--accent);opacity:0;pointer-events:none;animation:speech-ripple 1.6s ease-out infinite}
+.icon-button.speaking::after{animation-delay:.8s}
+@keyframes speech-ripple{0%{transform:scale(.95);opacity:.5}100%{transform:scale(1.6);opacity:0}}
+.icon-button.speaking .icon{animation:speech-pulse 1.2s ease-in-out infinite}
+@keyframes speech-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.icon-button.speaking .icon{animation:none}.icon-button.speaking::before,.icon-button.speaking::after{animation:none}}
 .app.chat-open{grid-template-rows:0 minmax(0,1fr) 0;background:linear-gradient(155deg,#eff6ff,#e9f3ff 65%,#e2efff)}
 .chat-open>.chat-page{padding:calc(12px + env(safe-area-inset-top)) 12px max(16px,env(safe-area-inset-bottom));gap:12px}
 .chat-heading{gap:0;min-height:44px}.chat-heading h2{flex:1;min-width:0}.chat-heading #chatBack{margin-left:-4px}

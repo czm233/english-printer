@@ -109,6 +109,7 @@ const { spawn } = require('node:child_process');
     assert.equal(await speakBtn.getAttribute('aria-label'), '朗读英文');
     assert.ok(await speakBtn.locator('i.icon-volume').count() === 1);
     assert.ok(await speakBtn.locator('i.icon-stop').count() === 0);
+    assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Idle button must not have speaking class');
 
     // Clean start verification: cancelCount should be 0 before any click
     assert.equal(await page.evaluate(() => window.fakeSpeech.cancelCount), 0);
@@ -121,22 +122,29 @@ const { spawn } = require('node:child_process');
     assert.equal(await page.evaluate(() => window.fakeSpeech.speakCount), 1);
     assert.equal(await page.evaluate(() => window.fakeSpeech.currentUtterance.text), 'good morning');
 
-    // Immediate active state verification
+    // Immediate active state verification: speaker icon is KEPT while playing
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'true');
     assert.equal(await speakBtn.getAttribute('aria-label'), '停止朗读');
-    assert.ok(await speakBtn.locator('i.icon-stop').count() === 1);
-    assert.ok(await speakBtn.locator('i.icon-volume').count() === 0);
+    assert.ok(await speakBtn.locator('i.icon-volume').count() === 1, 'Playing button must keep the volume icon');
+    assert.ok(await speakBtn.locator('i.icon-stop').count() === 0, 'Playing button must NOT swap to a square stop icon');
+    assert.ok(await speakBtn.evaluate(el => el.classList.contains('speaking')), 'Playing button must have speaking class');
 
-    // Verify visual design token styling on playing button
+    // Verify visual design token styling and animated playing feedback on playing button
     const styles = await speakBtn.evaluate(el => {
       const s = getComputedStyle(el);
       return {
         color: s.color,
         background: s.backgroundColor,
-        boxShadow: s.boxShadow
+        boxShadow: s.boxShadow,
+        iconAnimation: getComputedStyle(el.querySelector('.icon')).animationName,
+        rippleAnimation: getComputedStyle(el, '::before').animationName,
+        rippleBorder: getComputedStyle(el, '::before').borderTopColor
       };
     });
     assert.ok(styles.boxShadow.includes('2px'), 'Active button must have ring box-shadow');
+    assert.equal(styles.iconAnimation, 'speech-pulse', 'Playing icon must pulse');
+    assert.equal(styles.rippleAnimation, 'speech-ripple', 'Playing button must show expanding ripple rings');
+    assert.ok(styles.rippleBorder.includes('23, 101, 239') || styles.rippleBorder.includes('rgb(23, 101, 239)'), 'Ripple rings must use accent color');
 
     // 2. Normal completion (onend)
     await page.evaluate(() => window.fakeSpeech.currentUtterance.onend());
@@ -144,6 +152,8 @@ const { spawn } = require('node:child_process');
     assert.equal(await speakBtn.getAttribute('aria-label'), '朗读英文');
     assert.ok(await speakBtn.locator('i.icon-volume').count() === 1);
     assert.ok(await speakBtn.locator('i.icon-stop').count() === 0);
+    assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Finished button must drop speaking class');
+    assert.equal(await speakBtn.evaluate(el => getComputedStyle(el, '::before').animationName), 'none', 'Ripple must stop after completion');
 
     // 3. Toggle behavior on active #speak
     await speakBtn.click();
@@ -152,6 +162,7 @@ const { spawn } = require('node:child_process');
     await speakBtn.click();
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'false');
     assert.ok(await speakBtn.locator('i.icon-volume').count() === 1);
+    assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Toggled-off button must drop speaking class');
     assert.ok(await page.evaluate(() => window.fakeSpeech.cancelCount > 0), 'Toggle stop must call cancel');
 
     // 4. Error handling
@@ -179,6 +190,7 @@ const { spawn } = require('node:child_process');
     // Watchdog must reset the button to idle
     assert.equal(await speakBtn.getAttribute('aria-pressed'), 'false', 'Watchdog must reset button to idle');
     assert.ok(await speakBtn.locator('i.icon-volume').count() === 1);
+    assert.ok(!(await speakBtn.evaluate(el => el.classList.contains('speaking'))), 'Watchdog reset must drop speaking class');
     // User can immediately click to speak again after silent drop
     const prevCount = await page.evaluate(() => window.fakeSpeech.speakCount);
     await speakBtn.click();
@@ -196,6 +208,8 @@ const { spawn } = require('node:child_process');
     await sampleBtn.click();
     assert.equal(await sampleBtn.getAttribute('aria-pressed'), 'true');
     assert.equal(await sampleBtn.getAttribute('aria-label'), '正在朗读预览英文');
+    assert.ok(await sampleBtn.locator('i.icon-volume').count() === 1, 'Sample button must keep volume icon while playing');
+    assert.equal(await sampleBtn.evaluate(el => getComputedStyle(el, '::before').animationName), 'speech-ripple', 'Sample button must show ripple while playing');
     const expectedSample = await page.locator('#sampleWord').inputValue();
     assert.equal(await page.evaluate(() => window.fakeSpeech.currentUtterance.text), expectedSample);
 
@@ -271,7 +285,7 @@ const { spawn } = require('node:child_process');
     await unsupportedPage.close();
 
     assert.deepEqual(errors, [], 'No unexpected page errors');
-    console.log('PASS speech lifecycle: clean start (no cancel), active state, watchdog recovery, toggle, preemption, visibilitychange, unsupported fallback.');
+    console.log('PASS speech lifecycle: clean start (no cancel), speaker icon kept with ripple animation while playing, watchdog recovery, toggle, preemption, visibilitychange, unsupported fallback.');
   } finally {
     await browser.close();
     if (serverProcess) {
